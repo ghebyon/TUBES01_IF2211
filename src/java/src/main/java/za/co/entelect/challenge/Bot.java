@@ -149,6 +149,12 @@ public class Bot {
     }
     
     //Method dengan return boolean
+    /*  hitung terlebih dahulu jumlah damage yang diberikan jika melewati lane tersebut tanpa menggunakan lizard
+        periksa apakah damage myCar + damage >= 3
+        atau
+        block myCar + speed myCar > block myCar + blok lastObstacle
+        dengan lastObstacle adalah obstalce terakhir di lane pada saat pemeriksaan lane
+    */
     private boolean predictToUseLizardCauseTerrain(List<Object> nextBlock){
         int damage = calculatePossibleDamageFromChoosenWay(nextBlock);
         if (this.myCar.damage + damage >= 3 || (this.myCar.position.block + this.myCar.speed > this.myCar.position.block + idxLastObstacle(nextBlock, lastObstacleInFront(nextBlock)))){
