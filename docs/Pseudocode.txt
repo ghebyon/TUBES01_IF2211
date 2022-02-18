@@ -8,7 +8,7 @@ Deklarasi
     tweetPosition2 : Position
 Body
     //Inisiasi atribut pendukung
-    if( RoundSaatIni = 1) then
+    if( gamestate.currentRound = 1) then
         countEMP <- 0
         opponentFixPosition <- opponent.position
 
