@@ -377,3 +377,31 @@ function dodgeEMP() -> Command
     // Pindah ke lane yang aman :
     // 1. lane 1 atau lane 2, maka pindah ke kanan
     // 2. lane 3 atau lane 4, maka pindah ke kiri
+
+function countPowerUpsFromChoosenWay(blocks : list of Object) -> integer
+    // Mengembalikan banyak PowerUps yang akan diterima bila melewati kumpulan blocks yang dipilih
+
+function calculatePossibleDamageFromChoosenWay(blocks : list of Object) -> integer
+    // Mengembalikan damage yang akan diterima bila melewati kumpulan blocks yang dipilih
+
+funtion havePowerUps(name : PowerUps, inCar : array of PowerUps) -> boolean
+    // Memeriksa apakah pada suatu List PowerUps memiliki PowerUps yang diinginkan
+
+function lastObstacleInFront(lane : list of Object) -> Object
+
+function idxLastObstacle(lane : list of Object, nameTerrain : Object) -> integer
+
+function isThereObstacle(blocks : list of Object) -> boolean
+    // Digunakan untuk memeriksa apakah pada blocks 
+       memiliki salah satu jenis terrain berikut : WALL, MUD, OIL_SPILL*/
+
+function isSafePosition() -> boolean
+    // Digunakan untuk memeriksa apakah posisi myCar sekarang dalam posisi aman.
+       /* Posisi aman berada pada :
+        * Blok yang akan dilewati selanjutnya tidak memiliki bad terrain (oil spill, wall, mud) dan
+        * (jarak opponent dan myCar > 20 dengan myCar berada lebih di depan atau
+        *  jarak opponent dan myCar antara 1 dan 20 serta opponent tidak memiliki EMP  atau
+        *  jarak opponent dan myCar > 15 dengan opponent berada lebih di depan) */
+
+function getBlocksInFront(lane : integer, block : integer, size : integer) -> list of Object
+    // Mengambil block yang berada di depan posisi (lane,block) sebesar size
