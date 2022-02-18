@@ -11,6 +11,7 @@ Body
     if( gamestate.currentRound = 1) then
         countEMP <- 0
         opponentFixPosition <- opponent.position
+    endif
 
     //Strategi Memperbaiki Mobil
     if (myCar.damage >= 3) then
@@ -18,19 +19,20 @@ Body
     else if (myCar.damage = 2 or myCar.damage = 1) then
         if (isSafePosition())  then
             -> FIX
+    endif
 
     //Strategi Menggunakan Boost
     //Periksa myCar memiliki PowerUps Boost dan sedang tidak menggunakan boost,
     //kemudian lakukan prediksi apakah Boost layak dipakai
     if(havePowerUps(PowerUps.BOOST, myCar.powerups) and myCar.boostCounter = 0 and predictToUseBoost()) then
         -> BOOST
+    endif
 
     nextBlock <- getBlocksInFront(myCar.position.lane, myCar.position.block, myCar.speed)
 
     //Periksa apakah terdapat obstacle pada Block yang dipilih
     if(isThereObstacle(nextBlock)) then 
-        //Jika terdapat  obstacle pada nextBlock
-        
+        //Jika terdapat  obstacle pada nextBlock  
         //Strategi Menggunakan Lizard dan Strategi Perpindahan Lane
         if (havePowerUps(PowerUps.LIZARD, myCar.powerups) and 
             (predictToUseLizardCauseTerrain(nextBlock) or predictToUseLizardCauseOpponent())) then
@@ -40,7 +42,7 @@ Body
         else
             //Jika tidak pilih arah yang effektif
             -> getEffectiveDirection_Calculate()
-        
+        endif
     else if(not isThereObstacle(nextBlock)) then
         //Jika tidak terdapat obstacle pada nextBlock
 
@@ -49,7 +51,7 @@ Body
             myCar.position.block > opponent.position.block and
             myCar.position.block - opponent.position.block <= 2) then
             -> dodgeEMP()
-        
+        endif
 
         //Strategi Penggunaan EMP dan Strategi untuk overtake  opponent
         if (opponent.position.block > myCar.position.block ) then
@@ -68,11 +70,11 @@ Body
                     if (opponent.position.block > myCar.position.block + myCar.speed) then
                         countEMP <- 1
                         -> EMP
-                    
+                    endif
                 else
                     countEMP <- 1
                     -> EMP
-                
+                endif
             else
                 //Strategi Menggunakan Lizard dan Strategi Perpindahan Lane
                 countEMP <- 0
@@ -81,9 +83,9 @@ Body
                     -> LIZARD
                 else
                     -> getEffectiveDirection_Calculate()
-                
-            
-        
+                endif
+            endif
+        endif
 
         //Strategi Penggunaan Tweet
         /*Terdiri dari strategi pemilihan :
@@ -96,14 +98,14 @@ Body
             -> TweetCommand(tweetPosition1.lane, tweetPosition1.block +opponent.speed + 4)
         else
             opponentFixPosition <- opponent.position
-        
+        endif
         if(tweetPosition2.block != 0 and tweetPosition2.lane != 0) then
             -> TweetCommand(tweetPosition2.lane, tweetPosition2.block)
-        
+        endif
         //Strategi Penggunaan OIL
         if (havePowerUps(PowerUps.OIL, myCar.powerups) and predictToUseOil()) then
             -> OIL
-        
+        endif
     
     
     -> ACCELERATE
@@ -123,7 +125,7 @@ BODY
        (myCar.position.block + myCar.speed > 
         myCar.position.block + idxLastObstacle (nextBlock, lastObstacleInFront(nextBlock)))) then
         -> true
-    
+    endif
     -> false 
 
 
@@ -139,7 +141,7 @@ BODY
         opponent.position.block > myCar.position.block and 
         myCar.position.block + myCar.speed > opponent.position.block + opponent.speed) then
         -> true
-    
+    endif
     -> false
 
 
@@ -155,28 +157,27 @@ BODY
     if (opponent.position.lane = myCar.position.lane and opponent.position.block < myCar.position.block ) then
         if (myCar.position.block - opponent.position.block <= 5) then
             -> true
+        endif
         else
             if (myCar.position.lane = 1) then
                 RightBlocks <- getBlocksInFront(myCar.position.lane+1, myCar.position.block, myCar.speed)
                 if (isThereObstacle(RightBlocks)) then
                     -> true
-                
+                endif
+            endif
             else if (myCar.position.lane = 4) then
                 LeftBlocks <- getBlocksInFront(myCar.position.lane - 1, myCar.position.block, myCar.speed)
                 if (isThereObstacle(LeftBlocks)) then
                     -> true
-                
+                endif
             else
                 RightBlocks <- getBlocksInFront(myCar.position.lane + 1, myCar.position.block, myCar.speed)
                 LeftBlocks <- getBlocksInFront(myCar.position.lane - 1, myCar.position.block, myCar.speed)
                 if (isThereObstacle(RightBlocks) or isThereObstacle(LeftBlocks)) then
                     -> true
-                
-            
-        
-    
+                endif     
+    endif       
     -> false
-
 
 /* Memeriksa apakah di suatu posisi, opponent sedang melakukan fix
  * Akan mengembalikan posisi opponent bila sedang melakukan fix */
@@ -194,7 +195,8 @@ BODY
         else
             target.block <- 0
             target.lane <- 0
-        
+        endif
+    endif    
     
     -> target
 
@@ -230,13 +232,13 @@ BODY
                         if (not isThereObstacle(RightBlocks)) then
                             target.lane <- i+1
                             target.block <- opponent.position.block + 1
-                        
+                        endif
                     else if(i = 4) then
                         LeftBlocks <- getBlocksInFront(i-1, opponent.position.block, opponent.speed-1)
                         if (not isThereObstacle(LeftBlocks)) then
                             target.lane <- i-1
                             target.block <- opponent.position.block + 1
-                        
+                        endif
                     else
                         LeftBlocks <- getBlocksInFront(i-1, opponent.position.block, opponent.speed-1)
                         RightBlocks <- getBlocksInFront(i+1, opponent.position.block, opponent.speed-1)
@@ -249,12 +251,17 @@ BODY
                         else if (isThereObstacle(LeftBlocks) and not isThereObstacle(RightBlocks)) then
                             target.lane <- i + 1
                             target.block <- opponent.position.block + 1
-                i <- 1
+                        endif
+                    endif
+                i <- i + 1
+                endif
+            endwhile
 
         else if (myCar.position.block - opponent.position.block > 5 or myCar.position.block - opponent.position.block < 0)  then
             target.lane <- opponent.position.lane
             target.block <- opponent.position.block + 1
-        
+        endif
+    endif    
     
     -> target
 
@@ -267,7 +274,7 @@ BODY
     blocks <- getBlocksInFront(myCar.position.lane, myCar.position.block, 15)
     if (not isThereObstacle(blocks)) then
         -> true
-    
+    endif
     -> false
 
 function getEffectiveDirection_Calculate() -> Command
@@ -299,8 +306,8 @@ BODY
                     direction <- "Stay"
                 else
                     direction <- "Right"
-                
-            
+                endif
+            endif
         else if(myCar.position.lane = 4) then
             List<Object> LeftBlocks = getBlocksInFront(myCar.position.lane - 1, myCar.position.block-1, myCar.speed)
             damage_L <- calculatePossibleDamageFromChoosenWay(LeftBlocks)
@@ -314,8 +321,8 @@ BODY
                     direction <- "Stay"
                 else{
                     direction <- "Left"
-                
-            
+                endif
+            endif
         else
             LeftBlocks <- getBlocksInFront(myCar.position.lane - 1, myCar.position.block - 1, myCar.speed)
             RightBlocks <- getBlocksInFront(myCar.position.lane + 1, myCar.position.block - 1, myCar.speed)
@@ -324,49 +331,48 @@ BODY
             if (damage_C < damage_R) then
                 if (damage_C > damage_L) then
                     direction <- "Left"
-                 else if (damage_C < damage_L) then
+                else if (damage_C < damage_L) then
                     direction <- "Stay"
-                 else
+                else
                     collectedPowerUps_L = countPowerUpsFromChoosenWay(LeftBlocks)
                     if (collectedPowerUps_C >= collectedPowerUps_L) then
                         direction <- "Stay"
-                     else 
+                    else 
                         direction <- "Left"
-                    
-                
+                    endif
+                endif
              else if (damage_C > damage_R) then
                 if (damage_L < damage_R) then
                     direction <- "Left"
-                 else if (damage_L > damage_R) then
+                else if (damage_L > damage_R) then
                     direction <- "Right"
-                 else 
+                else 
                     collectedPowerUps_L = countPowerUpsFromChoosenWay(LeftBlocks)
                     collectedPowerUps_R = countPowerUpsFromChoosenWay(RightBlocks)
                     if (collectedPowerUps_L > collectedPowerUps_R) then
                         direction <- "Left"
-                     else if (collectedPowerUps_L < collectedPowerUps_R) then
+                    else if (collectedPowerUps_L < collectedPowerUps_R) then
                         direction <- "Right"
-                     else 
+                    else 
                         //Random, tapi untuk sementara pilih left
                         direction <- "Left"
-                    
-                
-             else 
+                    endif
+                endif
+            else 
                 if (damage_C > damage_L) then
                     direction <- "Left"
-                 else if (damage_C <= damage_L) then
+                else if (damage_C <= damage_L) then
                     direction <- "Stay"
-                
+                endif
+            endif    
             
-        
-
         if (direction = "Stay") then
             -> ACCELERATE
         else if(direction = "Left")then
             -> LEFT
         else if(direction = "Right")then
             -> RIGHT
-        
+        endif
         -> ACCELERATE
     
 
