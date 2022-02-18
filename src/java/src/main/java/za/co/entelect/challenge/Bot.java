@@ -215,9 +215,9 @@ public class Bot {
     /* Posisi yang akan dikembalikan :
      * Kasus 1 : opponent berada pada jarak 2 s.d 5 di belakang
             periksa lane yang mungkin akan dilewati opponent, bila pada lane-lane tersebut belum ada obstacle,
-            posisi target menjadi di lane tersebut dan blocknya +1 dari posisi block opponent
+            posisi target menjadi di lane tersebut dan blocknya +speed + 4 dari posisi block opponent
      * Kasus 2 : opponent berada pada jarak > 5 di belakang atau berada pada jarak >20 di depan
-            posisi target menjadi tepat di depan opponent
+            posisi target menjadi tepat di depan opponent + speed + 4
      */
     private Position predictToUseTweet2(Position fixPosition){
         Position target = new Position();
@@ -225,7 +225,10 @@ public class Bot {
         target.lane = 0;
         if(havePowerUps(PowerUps.TWEET, this.myCar.powerups)){
             //Prediksi Target peletakan bila pada state tersebut opponent berada pada jangkauan myCar
-            if ((this.myCar.position.block - this.opponent.position.block <= 5 && this.myCar.position.block - this.opponent.position.block > 1) || (this.opponent.position.lane == fixPosition.lane && this.opponent.position.block == fixPosition.block)){
+            if ((this.myCar.position.block - this.opponent.position.block <= 5 && this.myCar.position.block - this.opponent.position.block > 1)
+                    || (this.opponent.position.lane == fixPosition.lane && this.opponent.position.block == fixPosition.block)
+                    || (this.myCar.position.block - this.opponent.position.block > 5 ||
+                    this.myCar.position.block - this.opponent.position.block < 0) ){
                 int i = this.opponent.position.lane;
                 List<Object> blocks = new ArrayList<>();
                 blocks = getBlocksInFront(i, this.opponent.position.block, this.opponent.speed);
@@ -253,7 +256,7 @@ public class Bot {
                         LeftBlocks = getBlocksInFront(i - 1, this.opponent.position.block, this.opponent.speed - 1);
                         RightBlocks = getBlocksInFront(i + 1, this.opponent.position.block, this.opponent.speed - 1);
                         if (!isThereObstacle(LeftBlocks) && !isThereObstacle(RightBlocks)) {
-                            target.lane = i; //Taro di lane musuh langsung
+                            target.lane = i - 1; //asumsi musuh belok kiri
                             target.block = this.opponent.position.block + this.opponent.speed + 4;
                         } else if (!isThereObstacle(LeftBlocks) && isThereObstacle(RightBlocks)) {
                             target.lane = i - 1;
@@ -265,10 +268,6 @@ public class Bot {
 
                     }
                 }
-            }else if(this.myCar.position.block - this.opponent.position.block > 5 ||
-                    this.myCar.position.block - this.opponent.position.block < 0) {
-                target.lane = this.opponent.position.lane;
-                target.block = this.opponent.position.block + this.opponent.speed+4;
             }
         }
         return target;
