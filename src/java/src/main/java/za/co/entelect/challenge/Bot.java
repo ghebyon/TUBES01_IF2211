@@ -22,15 +22,15 @@ public class Bot {
     private final static Command EMP = new EmpCommand();
     //FIX CAR
     private final static Command FIX = new FixCommand();
-    
+
     private Car opponent;
     private Car myCar;
     private List<Lane[]> map;
-    
+
     //Atribut Tambahan
     public static Position opponentFixPosition; //Posisi opponent saat sedang memperbaiki mobilnya
     public static int countEMP; //Menghitung penggunaan EMP, diisi oleh nilai 1(baru saja digunakan) dan 0 sebaliknya
-    
+
     //Constructor Bot
     public Bot(Random random,GameState gameState) {
         this.gameState = gameState;
@@ -38,7 +38,7 @@ public class Bot {
         this.opponent = gameState.opponent;
         this.map = gameState.lanes;
     }
-    
+
     //Strategi Utama
     public Command run() {
         //Inisiasi atribut pendukung
@@ -46,7 +46,7 @@ public class Bot {
             countEMP = 0;
             opponentFixPosition = this.opponent.position;
         }
-        
+
         //Strategi Memperbaiki Mobil
         if (this.myCar.damage >= 3){
             return FIX;
@@ -55,23 +55,23 @@ public class Bot {
                 return FIX;
             }
         }
-        
+
         //Strategi Menggunakan Boost
         //Periksa myCar memiliki PowerUps Boost dan sedang tidak menggunakan boost,
         //kemudian lakukan prediksi apakah Boost layak dipakai
         if(havePowerUps(PowerUps.BOOST, this.myCar.powerups) && this.myCar.boostCounter == 0 && predictToUseBoost()){
             return BOOST;
         }
-        
+
         List<Object> nextBlock = getBlocksInFront(this.myCar.position.lane, this.myCar.position.block, this.myCar.speed);
-        
+
         //Periksa apakah terdapat obstacle pada Block yang dipilih
-        if(isThereObstacle(nextBlock)){ 
+        if(isThereObstacle(nextBlock)){
             //Jika terdapat  obstacle pada nextBlock
-            
+
             //Strategi Menggunakan Lizard dan Strategi Perpindahan Lane
-            if (havePowerUps(PowerUps.LIZARD, this.myCar.powerups) && 
-                (predictToUseLizardCauseTerrain(nextBlock) || predictToUseLizardCauseOpponent())){
+            if (havePowerUps(PowerUps.LIZARD, this.myCar.powerups) &&
+                    (predictToUseLizardCauseTerrain(nextBlock) || predictToUseLizardCauseOpponent())){
                 //Periksa apakah myCar memiliki PowerUps Lizard
                 //kemudian lakukan prediksi apakah Boost layak dipakai
                 return LIZARD;
@@ -83,9 +83,9 @@ public class Bot {
             //Jika tidak terdapat obstacle pada nextBlock
 
             //Strategi Memprediksi apakah musuh akan menggunakan EMP dan cara yang mungkin untuk menghindarinya
-            if (havePowerUps(PowerUps.EMP, this.opponent.powerups) && 
-                this.myCar.position.block > this.opponent.position.block &&
-                this.myCar.position.block - this.opponent.position.block <= 2){
+            if (havePowerUps(PowerUps.EMP, this.opponent.powerups) &&
+                    this.myCar.position.block > this.opponent.position.block &&
+                    this.myCar.position.block - this.opponent.position.block <= 2){
                 return dodgeEMP();
             }
 
@@ -93,15 +93,15 @@ public class Bot {
             if (this.opponent.position.block > this.myCar.position.block ){
                 //Jika myCar memiliki PowerUps EMP,
                 //lakukan pemeriksaan apakah EMP layak digunakan
-                /*  Kondisi layak penggunaan  EMP : 
+                /*  Kondisi layak penggunaan  EMP :
                     Posisi opponent berada pada 2 blok di depan kita dan masih di dalam map pada state yg sama.
                     Namun terdapat kasus khusus, jika opponent berada di lane yg sama maka harus dipenuhi kondisi :
                         posisi myCar di state selanjutnya tidak melebihi posisi opponent di state selanjutnya.
                  * */
-                if (havePowerUps(PowerUps.EMP, this.myCar.powerups) && 
-                    countEMP == 0 &&  
-                    this.opponent.position.block - this.myCar.position.block > 2 &&
-                    this.opponent.position.block - this.myCar.position.block <= 20){
+                if (havePowerUps(PowerUps.EMP, this.myCar.powerups) &&
+                        countEMP == 0 &&
+                        this.opponent.position.block - this.myCar.position.block > 2 &&
+                        this.opponent.position.block - this.myCar.position.block <= 20){
                     if (this.opponent.position.lane == this.myCar.position.lane){
                         if (this.opponent.position.block > this.myCar.position.block + this.myCar.speed){
                             countEMP = 1;
@@ -115,7 +115,7 @@ public class Bot {
                     //Strategi Menggunakan Lizard dan Strategi Perpindahan Lane
                     countEMP = 0;
                     if (havePowerUps(PowerUps.LIZARD, this.myCar.powerups) &&
-                        (predictToUseLizardCauseTerrain(nextBlock) || predictToUseLizardCauseOpponent())){
+                            (predictToUseLizardCauseTerrain(nextBlock) || predictToUseLizardCauseOpponent())){
                         return LIZARD;
                     }else{
                         return getEffectiveDirection_Calculate();
@@ -125,29 +125,25 @@ public class Bot {
 
             //Strategi Penggunaan Tweet
             /*Terdiri dari strategi pemilihan :
-             * 1. posisi didepan opponent saat melakukan Fix
-             * 2. posisi saat opponent berada di map sebelumnya atau di map selanjutnya atau
-             *    di map saat ini namun berada di belakang */
-            Position tweetPosition1 = predictToUseTweet1(opponentFixPosition);
-            Position tweetPosition2 = predictToUseTweet2();
-            if(tweetPosition1.block != 0 && tweetPosition1.lane != 0){
-                return new TweetCommand(tweetPosition1.lane, tweetPosition1.block +this.opponent.speed + 4);
+             * 1. Penggunaan saat opponent sedang melakukan fix
+             * 2. Penggunaan langsung setelah mendapat power up Tweet */
+            Position tweetPosition2 = predictToUseTweet2(opponentFixPosition);
+            if(tweetPosition2.block != 0 && tweetPosition2.lane != 0){
+                return new TweetCommand(tweetPosition2.lane, tweetPosition2.block);
             }else{
                 opponentFixPosition = this.opponent.position;
             }
-            if(tweetPosition2.block != 0 && tweetPosition2.lane != 0){
-                return new TweetCommand(tweetPosition2.lane, tweetPosition2.block);
-            }
+
             //Strategi Penggunaan OIL
             if (havePowerUps(PowerUps.OIL, this.myCar.powerups) && predictToUseOil()){
                 return OIL;
             }
         }
-        
+
         return ACCEL;
 
     }
-    
+
     //Method dengan return boolean
     /*  hitung terlebih dahulu jumlah damage yang diberikan jika melewati lane tersebut tanpa menggunakan lizard
         periksa apakah damage myCar + damage >= 3
@@ -160,7 +156,7 @@ public class Bot {
         if (this.myCar.damage + damage >= 3 || (this.myCar.position.block + this.myCar.speed > this.myCar.position.block + idxLastObstacle(nextBlock, lastObstacleInFront(nextBlock)))){
             return true;
         }
-        return false; 
+        return false;
     }
 
     //Method dengan return boolean
@@ -169,17 +165,17 @@ public class Bot {
        posisi block myCar + speed myCar > block opponet + speed opponent
      */
     private boolean predictToUseLizardCauseOpponent(){
-        if (this.opponent.position.lane == this.myCar.position.lane && 
-            this.opponent.position.block > this.myCar.position.block && 
-            this.myCar.position.block + this.myCar.speed > this.opponent.position.block + this.opponent.speed){
+        if (this.opponent.position.lane == this.myCar.position.lane &&
+                this.opponent.position.block > this.myCar.position.block &&
+                this.myCar.position.block + this.myCar.speed > this.opponent.position.block + this.opponent.speed){
             return true;
         }
         return false;
     }
 
     //Method dengan return boolean
-    /* opponent berada pada jarak 1 s.d 5 di belakang 
-       periksa lane yang mungkin akan dilewati opponent, bila pada lane-lane tersebut belum ada obstacle, 
+    /* opponent berada pada jarak 1 s.d 5 di belakang
+       periksa lane yang mungkin akan dilewati opponent, bila pada lane-lane tersebut belum ada obstacle,
        kembalikan true
      */
     private boolean predictToUseOil(){
@@ -213,86 +209,66 @@ public class Bot {
         return false;
     }
 
-    // Method dengan return Position
-    // Memeriksa apakah di suatu posisi, opponent sedang melakukan fix
-    // Akan mengembalikan posisi opponent bila sedang melakukan fix
-    private Position predictToUseTweet1(Position fixPosition){
-        Position target = new Position();
-        target.block = 0;
-        target.lane = 0;
-        if(this.opponent.position.lane == fixPosition.lane && this.opponent.position.block == fixPosition.block){
-            if(havePowerUps(PowerUps.TWEET, this.myCar.powerups)){
-                target.block = this.opponent.position.block;
-                target.lane = this.opponent.position.lane;
-            }else{
-                target.block = 0;
-                target.lane = 0;
-            }
-        }
-        return target;
-    }
+
 
     // Method dengan return Position
     /* Posisi yang akan dikembalikan :
-     * Kasus 1 : opponent berada pada jarak 2 s.d 5 di belakang 
-            periksa lane yang mungkin akan dilewati opponent, bila pada lane-lane tersebut belum ada obstacle, 
+     * Kasus 1 : opponent berada pada jarak 2 s.d 5 di belakang
+            periksa lane yang mungkin akan dilewati opponent, bila pada lane-lane tersebut belum ada obstacle,
             posisi target menjadi di lane tersebut dan blocknya +1 dari posisi block opponent
      * Kasus 2 : opponent berada pada jarak > 5 di belakang atau berada pada jarak >20 di depan
             posisi target menjadi tepat di depan opponent
      */
-    private Position predictToUseTweet2(){
+    private Position predictToUseTweet2(Position fixPosition){
         Position target = new Position();
         target.block = 0;
         target.lane = 0;
         if(havePowerUps(PowerUps.TWEET, this.myCar.powerups)){
             //Prediksi Target peletakan bila pada state tersebut opponent berada pada jangkauan myCar
-            if (this.myCar.position.block - this.opponent.position.block <= 5 && this.myCar.position.block - this.opponent.position.block > 1){
-                int i = 1;
-                while(i <= 4 && i != this.myCar.position.lane){
-                    List<Object> blocks = new ArrayList<>();
-                    blocks = getBlocksInFront(i, this.opponent.position.block, this.opponent.speed);
-                    if (!isThereObstacle(blocks)){
-                        target.block = this.opponent.position.block + 1;
-                        target.lane = this.opponent.position.lane;
-                    }else{
-                        if (i == 1){
-                            List<Object> RightBlocks = new ArrayList<>();
-                            RightBlocks = getBlocksInFront(i+1, this.opponent.position.block, this.opponent.speed-1);
-                            if (!isThereObstacle(RightBlocks)){
-                                target.lane = i+1;
-                                target.block = this.opponent.position.block + 1;
-                            }
-                        }else if(i == 4){
-                            List<Object> LeftBlocks = new ArrayList<>();
-                            LeftBlocks = getBlocksInFront(i-1, this.opponent.position.block, this.opponent.speed-1);
-                            if (!isThereObstacle(LeftBlocks)){
-                                target.lane = i-1;
-                                target.block = this.opponent.position.block + 1;
-                            }
-                        }else{
-                            List<Object> LeftBlocks = new ArrayList<>();
-                            List<Object> RightBlocks = new ArrayList<>();
-                            LeftBlocks = getBlocksInFront(i-1, this.opponent.position.block, this.opponent.speed-1);
-                            RightBlocks = getBlocksInFront(i+1, this.opponent.position.block, this.opponent.speed-1);
-                            if (!isThereObstacle(LeftBlocks) && !isThereObstacle(RightBlocks)){
-                                target.lane= i - 1; //Pukul rata letak target tweet di sebelah kiri
-                                target.block = this.opponent.position.block + 1;
-                            }else if (!isThereObstacle(LeftBlocks) && isThereObstacle(RightBlocks)){
-                                target.lane= i - 1;
-                                target.block = this.opponent.position.block + 1;
-                            }else if (!isThereObstacle(LeftBlocks) && isThereObstacle(RightBlocks)){
-                                target.lane= i + 1;
-                                target.block = this.opponent.position.block + 1;
-                            }
-
+            if ((this.myCar.position.block - this.opponent.position.block <= 5 && this.myCar.position.block - this.opponent.position.block > 1) || (this.opponent.position.lane == fixPosition.lane && this.opponent.position.block == fixPosition.block)){
+                int i = this.opponent.position.lane;
+                List<Object> blocks = new ArrayList<>();
+                blocks = getBlocksInFront(i, this.opponent.position.block, this.opponent.speed);
+                if (!isThereObstacle(blocks)){
+                    target.block = this.opponent.position.block + this.opponent.speed + 4;
+                    target.lane = this.opponent.position.lane;
+                }else {
+                    if (i == 1) {
+                        List<Object> RightBlocks = new ArrayList<>();
+                        RightBlocks = getBlocksInFront(i + 1, this.opponent.position.block, this.opponent.speed - 1);
+                        if (!isThereObstacle(RightBlocks)) {
+                            target.lane = i + 1;
+                            target.block = this.opponent.position.block + this.opponent.speed + 4;
                         }
+                    } else if (i == 4) {
+                        List<Object> LeftBlocks = new ArrayList<>();
+                        LeftBlocks = getBlocksInFront(i - 1, this.opponent.position.block, this.opponent.speed - 1);
+                        if (!isThereObstacle(LeftBlocks)) {
+                            target.lane = i - 1;
+                            target.block = this.opponent.position.block + this.opponent.speed + 4;
+                        }
+                    } else {
+                        List<Object> LeftBlocks = new ArrayList<>();
+                        List<Object> RightBlocks = new ArrayList<>();
+                        LeftBlocks = getBlocksInFront(i - 1, this.opponent.position.block, this.opponent.speed - 1);
+                        RightBlocks = getBlocksInFront(i + 1, this.opponent.position.block, this.opponent.speed - 1);
+                        if (!isThereObstacle(LeftBlocks) && !isThereObstacle(RightBlocks)) {
+                            target.lane = i; //Taro di lane musuh langsung
+                            target.block = this.opponent.position.block + this.opponent.speed + 4;
+                        } else if (!isThereObstacle(LeftBlocks) && isThereObstacle(RightBlocks)) {
+                            target.lane = i - 1;
+                            target.block = this.opponent.position.block + this.opponent.speed + 4;
+                        } else if (!isThereObstacle(LeftBlocks) && isThereObstacle(RightBlocks)) {
+                            target.lane = i + 1;
+                            target.block = this.opponent.position.block + this.opponent.speed + 4;
+                        }
+
                     }
-                    i += 1;
                 }
             }else if(this.myCar.position.block - this.opponent.position.block > 5 ||
                     this.myCar.position.block - this.opponent.position.block < 0) {
                 target.lane = this.opponent.position.lane;
-                target.block = this.opponent.position.block + 1;
+                target.block = this.opponent.position.block + this.opponent.speed+4;
             }
         }
         return target;
@@ -300,7 +276,7 @@ public class Bot {
 
     //Method dengan return boolean
     private boolean predictToUseBoost(){
-        /*Method digunakan untuk mengecek apakah 15 blok di depan myCar 
+        /*Method digunakan untuk mengecek apakah 15 blok di depan myCar
           tidak memiliki jenis terrain yang merupakan obstacle*/
         List<Object> blocks = new ArrayList<>();
         blocks = getBlocksInFront(this.myCar.position.lane, this.myCar.position.block, 15);
@@ -343,10 +319,10 @@ public class Bot {
     }
 
     //Method dengan return Command
-    /* Pemeriksaan dilakukan pada lane disekitar posisi myCar 
+    /* Pemeriksaan dilakukan pada lane disekitar posisi myCar
             lane 1 -> periksa lane 1(current) 2(right)
             lane 2 -> periksa lane 1(left) 2(current) 3(right) ... dst;
-     * Pemeriksaan di tiap lane dilakukan pada block yang akan dilewati 
+     * Pemeriksaan di tiap lane dilakukan pada block yang akan dilewati
             current lane -> periksa blok current block + 1 s.d. current block + current speed)
             left lane & left right->  periksa block current blokck s.d. current block + current speed - 1.
      * Lane yang dipilih adalah lane yang memiliki damage minimal
@@ -542,7 +518,7 @@ public class Bot {
             return LEFT;
         }
     }
-   
+
     // Method dengan return List<Object>
     // Mengambil block yang berada di depan posisi (lane,block) sebesar size
     private List<Object> getBlocksInFront(int lane, int block, int size){
