@@ -8,9 +8,9 @@ Untuk menjalankan bot, dibutuhkan beberapa aplikasi seperti Java JDK 8, IntelliJ
 
 # Build
 File bot.java dan main.java terlebih dahulu dibuild sebagai file executable java (.jar) yang nantinya digunakan untuk menjalankan bot di game. Namun, sebelum menjalankan game terlebih dahulu dilakukan beberapa konfigurasi file pada :
-game-runner-config.json : file yang diberisikan konfigurasi lokasi file kedua pemain, hasil pertandingan, game engine yang digunakan, dan konfigurasi game yang digunakan.
-game-config.json : file yang berisikan konfigurasi game, seperti panjang lintasan, banyak lane, dll.
-bot.json : file yang berisikan identitas bot yang dibuat.
+- game-runner-config.json : file yang diberisikan konfigurasi lokasi file kedua pemain, hasil pertandingan, game engine yang digunakan, dan konfigurasi game yang digunakan.
+- game-config.json : file yang berisikan konfigurasi game, seperti panjang lintasan, banyak lane, dll.
+- bot.json : file yang berisikan identitas bot yang dibuat.
 
 # Author
 13520026 Muhammad Fajar Ramadhan
