@@ -36,8 +36,8 @@ Greedy by Power Ups Boost adalah strategi dalam menggunakan boost. Jika mengguna
 Greedy by Power Ups Oil adalah strategi untuk dalam menggunakan Oil. Oil akan meletakan Oil_Spill pada posisi kita saat ini untuk round selanjutnya. Jika musuh dan diri sendiri berada pada lane yang sama dan mobil musuh berada di belakang dengan jarak kurang dari 5 maka Oil akan digunakan. Jika lebih dari lima, maka akan diprediksi dengan memeriksi lane kanan-kiri, jika pada lane kanan-kiri ada obstacle maka kemungkinan musuh akan tetap pada lane saat ini.
 
 # Author
-13520026 Muhammad Fajar Ramadhan
-13520079 Ghebyon Tohada Nainggolan
-13520120 Afrizal Sebastian
+1. 13520026 Muhammad Fajar Ramadhan
+2. 13520079 Ghebyon Tohada Nainggolan
+3. 13520120 Afrizal Sebastian
 
 
