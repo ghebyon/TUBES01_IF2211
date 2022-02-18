@@ -280,7 +280,7 @@ public class Bot {
                             }else if (!isThereObstacle(LeftBlocks) && isThereObstacle(RightBlocks)){
                                 target.lane= i - 1;
                                 target.block = this.opponent.position.block + 1;
-                            }else if (!isThereObstacle(LeftBlocks) && isThereObstacle(RightBlocks)){
+                            }else if (isThereObstacle(LeftBlocks) && !isThereObstacle(RightBlocks)){
                                 target.lane= i + 1;
                                 target.block = this.opponent.position.block + 1;
                             }
