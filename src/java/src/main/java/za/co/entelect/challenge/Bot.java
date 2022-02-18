@@ -258,7 +258,7 @@ public class Bot {
                         } else if (!isThereObstacle(LeftBlocks) && isThereObstacle(RightBlocks)) {
                             target.lane = i - 1;
                             target.block = this.opponent.position.block + this.opponent.speed + 4;
-                        } else if (!isThereObstacle(LeftBlocks) && isThereObstacle(RightBlocks)) {
+                        } else if (isThereObstacle(LeftBlocks) && !isThereObstacle(RightBlocks)) {
                             target.lane = i + 1;
                             target.block = this.opponent.position.block + this.opponent.speed + 4;
                         }
